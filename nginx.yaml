@@ -1,0 +1,41 @@
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: rlucas-nginx
+    labels:
+      app: nginx
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: nginx
+    template:
+      metadata:
+        labels:
+          app: nginx
+      spec:
+        containers:
+          - name: rlucas-nginx
+            image: rlucas-nginx:1.0
+            imagePullPolicy: Never
+            ports:
+              - containerPort: 22
+              - containerPort: 80
+              - containerPort: 443
+---
+# Setup the load balancer for nginx.
+apiVersion: v1
+kind: Service
+metadata:
+  name: rlucas-nginx
+spec:
+  type: LoadBalancer
+  selector:
+    app: nginx
+  ports:
+  - port: 80
+    name: http
+  - port: 443
+    name: https
+  - port: 22
+    name: ssh
