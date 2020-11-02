@@ -1,14 +1,14 @@
 #!/bin/bash
 
 export MINIKUBE_IN_STYLE=false
-export MINIKUBE_HOME=~/goinfre
+# export MINIKUBE_HOME=~/goinfre
 
 # Start the minikube cluster using virtualbox as the driver.
 minikube start --driver=virtualbox
 
 # minikube is running its own docker daemon, use this line to connect
 # to it.
-eval $(minikube -p minikube docker-env)
+eval $(minikube -p minikube --shell zsh docker-env)
 
 # This line should set up auto complete options for kubectl
 source <(kubectl completion zsh)

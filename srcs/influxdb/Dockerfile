@@ -1,6 +1,6 @@
 # Dockerfile for InfluxDB
 
-FROM alpine:edge
+FROM alpine:latest
 
 RUN apk update \
         && apk add influxdb
