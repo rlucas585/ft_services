@@ -1,3 +1,16 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app: influxdb
+  name: influxdb-creds
+type: Opaque
+stringData:
+  INFLUX_URL: http://rlucas-influxdb:8086
+  INFLUX_USER: telegraf
+  INFLUX_PASSWORD: codam
+  INFLUX_DATABASE: telegrafdb
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -16,7 +29,32 @@ spec:
     spec:
       containers:
         - name: rlucas-influxdb
+          envFrom:
+          - secretRef:
+              name: influxdb-creds
           image: rlucas-influxdb:1.0
           imagePullPolicy: Never
           ports:
             - containerPort: 8086
+          volumeMounts:
+          - mountPath: /var/lib/influxdb
+            name: var-lib-influxdb
+      volumes:
+      - name: var-lib-influxdb
+        persistentVolumeClaim:
+          claimName: rlucas-influxdb
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app: influxdb
+  name: rlucas-influxdb
+  namespace: default
+spec:
+  ports:
+    - port: 8086
+      targetPort: 8086
+  selector:
+    app: influxdb
+---
