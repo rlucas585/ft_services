@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app: mysql
+  name: mysql-creds
+type: Opaque
+stringData:
+  MYSQL_USERNAME: admin
+  MYSQL_PASSWORD: codam
+  MYSQL_DB: mysqldb
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  labels:
+    app: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          envFrom:
+          - secretRef:
+              name: mysql-creds
+          image: rlucas-mysql:1.0
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+          - mountPath: /var/lib/mysql
+            name: var-lib-mysql
+      volumes:
+      - name: var-lib-mysql
+        persistentVolumeClaim:
+          claimName: mysql
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app: mysql
+  name: mysql
+  namespace: default
+spec:
+  ports:
+    - port: 3306
+      targetPort: 3306
+  selector:
+    app: mysql
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: mysql
+  name: mysql
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+

@@ -3,14 +3,15 @@
 FROM alpine:latest
 
 RUN apk update \
-        && apk add influxdb
+        && apk add influxdb \
+				&& mkdir -p /etc/influxdb
 
-COPY influxdb.conf /etc/influxdb.conf
-COPY entry.sh /entry.sh
-RUN chmod +x /entry.sh
+COPY influxdb.conf /etc/influxdb/influxdb.conf
+# COPY entry.sh /entry.sh
+# RUN chmod +x /entry.sh
 
 EXPOSE 8086
-VOLUME /var/lib/influxdb
+# VOLUME /var/lib/influxdb
 WORKDIR /
 
 # RUN ./entry.sh

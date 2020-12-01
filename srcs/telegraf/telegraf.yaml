@@ -3,39 +3,49 @@ kind: ServiceAccount
 metadata:
   labels:
     app: telegraf
-  name: telegraf-serv-acc
+  name: telegraf-sa
 ---
-apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: telegraf-role
+  name: telegraf-influxdb-viewer
   labels:
-    app: telegraf
+    rbac.authorization.k8s.io/aggregate-view-telegraf: "true"
 rules:
-- apiGroups: ["apps", "", "metrics.k8s.io"]
-  resources: ["deployments", "pods", "services"]
-  verbs: ["get", "list", "watch"]
+  # Allow telegraf to get metrics from the metrics server
+- apiGroups: ["", "metrics.k8s.io"]
+  resources: ["persistentvolumes","nodes", "pods", "endpoints"]
+  verbs: ["get","list","watch"]
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: telegraf-cr
+aggregationRule:
+  clusterRoleSelectors:
+  - matchLabels:
+      rbac.authorization.k8s.io/aggregate-view-telegraf: "true"
+  - matchLabels:
+      rbac.authorization.k8s.io/aggregate-to-view: "true"
+rules: []
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  labels:
-    app: telegraf
-  name: telegraf-rolebinding
+  name: telegraf-crb
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: telegraf-role
+  name: telegraf-cr
 subjects:
-  - kind: ServiceAccount
-    name: telegraf-serv-acc
-    namespace: default
-    apiGroup: ""
+- kind: ServiceAccount
+  name: telegraf-sa
+  namespace: default
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: rlucas-telegraf
+  name: telegraf
   labels:
     app: telegraf
 spec:
@@ -48,11 +58,40 @@ spec:
       labels:
         app: telegraf
     spec:
-      serviceAccountName: telegraf-serv-acc
+      serviceAccountName: telegraf-sa
       containers:
-        - name: rlucas-telegraf
+        - name: telegraf
           image: rlucas-telegraf:1.0
           imagePullPolicy: Never
           envFrom:
             - secretRef:
                 name: influxdb-creds
+
+# Scrap
+# apiVersion: rbac.authorization.k8s.io/v1
+# kind: ClusterRole
+# metadata:
+#   name: telegraf-role
+#   labels:
+#     app: telegraf
+#     rbac.authorization.k8s.io/aggregate-view-telegraf: "true"
+# rules:
+# - apiGroups: ["apps", "", "metrics.k8s.io"]
+#   resources: ["deployments", "pods", "services", "persistentvolumes", "nodes", "endpoints", "statefulsets"]
+#   verbs: ["get", "list", "watch"]
+# ---
+# apiVersion: rbac.authorization.k8s.io/v1
+# kind: ClusterRoleBinding
+# metadata:
+#   labels:
+#     app: telegraf
+#   name: telegraf-rolebinding
+# roleRef:
+#   apiGroup: rbac.authorization.k8s.io
+#   kind: ClusterRole
+#   name: telegraf-role
+# subjects:
+#   - kind: ServiceAccount
+#     name: telegraf-serv-acc
+#     namespace: default
+#     apiGroup: ""

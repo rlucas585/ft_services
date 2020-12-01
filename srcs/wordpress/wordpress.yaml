@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress
+  labels:
+    app: wordpress
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wordpress
+  template:
+    metadata:
+      labels:
+        app: wordpress
+    spec:
+      containers:
+        - name: wordpress
+          envFrom:
+          - secretRef:
+              name: mysql-creds
+          image: rlucas-wordpress:1.0
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 5050
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app: wordpress
+  name: wordpress
+  namespace: default
+  annotations:
+    metallb.universe.tf/allow-shared-ip: shared
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 5050
+      targetPort: 5050
+      name: http

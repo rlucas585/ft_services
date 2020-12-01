@@ -6,6 +6,9 @@ export MINIKUBE_IN_STYLE=false
 # Start the minikube cluster using virtualbox as the driver.
 minikube start --driver=virtualbox
 
+# Start the metrics-server
+minikube addons enable metrics-server
+
 # minikube is running its own docker daemon, use this line to connect
 # to it.
 eval $(minikube -p minikube --shell zsh docker-env)
@@ -40,13 +43,6 @@ kubectl apply -f srcs/metallb/metallb.yaml
 # kubectl create secret generic grafana-creds \
 # 	--from-literal=GF_SECURITY_ADMIN_USER=admin \
 # 	--from-literal=GF_SECURITY_ADMIN_PASSWORD=codam
-kubectl apply -f srcs/grafana/grafana.yaml
-
-## ConfigMap Generation
-
-kubectl create configmap grafana-config \
-  --from-file=influxdb-datasource.yml=srcs/grafana/influxdb-datasource.yml \
-  --from-file=grafana-dashboard-provider.yml=srcs/grafana/grafana-dashboard-provider.yml
 
 ## Create Docker images
 
@@ -56,31 +52,42 @@ docker build -t rlucas-nginx:1.0 srcs/nginx
 docker build -t rlucas-influxdb:1.0 srcs/influxdb
 docker build -t rlucas-grafana:1.0 srcs/grafana
 docker build -t rlucas-telegraf:1.0 srcs/telegraf
+docker build -t rlucas-mysql:1.0 srcs/mysql
+docker build -t rlucas-wordpress:1.0 srcs/wordpress
 #PasswordAuthentication yes
 
 ## Apply yaml files
 
-# Setup the kubernetes dashboard. To get the token to log in, run
-# ./bearer_token.sh
-# kubectl apply -f srcs/dashboard/dashboard.yaml
-
 # Creates an admin that can access the kubernetes dashboard
 kubectl apply -f srcs/dashboard/sa_cluster_admin.yaml
 
-# Run nginx server, with ssh enabled
-# kubectl apply -f srcs/nginx/nginx.yaml
+# Setup the kubernetes dashboard. To get the token to log in, run
+# ./bearer_token.sh
+kubectl apply -f srcs/dashboard/dashboard.yaml
+
+## ConfigMap Generation
+
+kubectl create configmap grafana-config \
+  --from-file=influxdb-datasource.yml=srcs/grafana/influxdb-datasource.yml \
+  --from-file=grafana-dashboard-provider.yml=srcs/grafana/grafana-dashboard-provider.yml
+
+# Deploy Grafana
+kubectl apply -f srcs/grafana/grafana.yaml
 
 # Run root deployment (containing dashboard)
-kubectl apply -f srcs/root.yaml
+# kubectl apply -f srcs/root.yaml
+
+# Run nginx deployment
+kubectl apply -f srcs/nginx/nginx.yaml
 
 # Create InfluxDB container
 kubectl apply -f srcs/influxdb/influxdb.yaml
 
-# Create a Persistent Volume Claim for InfluxDB
-kubectl apply -f srcs/pvc/pvc.yaml
-
 # Create telegraf container
 kubectl apply -f srcs/telegraf/telegraf.yaml
 
-# Launch load balancer
-kubectl apply -f srcs/LoadBalancer/loadbalancer.yaml
+# Deploy MySQL
+kubectl apply -f srcs/mysql/mysql.yaml
+
+# Deploy WordPress
+kubectl apply -f srcs/wordpress/wordpress.yaml

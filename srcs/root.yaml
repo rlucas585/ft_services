@@ -111,49 +111,21 @@ subjects:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: rlucas-root
+  name: dashboard
   labels:
-    app: root
+    app: dashboard
   namespace: default
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: root
+      app: dashboard
   template:
     metadata:
       labels:
-        app: root
+        app: dashboard
     spec:
       containers:
-        - name: rlucas-nginx
-          image: rlucas-nginx:1.0
-          imagePullPolicy: Never
-          ports:
-            - containerPort: 22
-            - containerPort: 80
-            - containerPort: 443
-        - name: rlucas-grafana
-          envFrom:
-          - secretRef:
-              name: grafana-creds
-          - secretRef:
-              name: influxdb-creds
-          image: rlucas-grafana:1.0
-          imagePullPolicy: Never
-          ports:
-            - containerPort: 3000
-          # 24/11/2020 Mounting each of the keys in the config map as files
-          # within the grafana container
-          volumeMounts:
-          - mountPath: /etc/grafana/provisioning/datasources/influxdb-datasource.yml
-            name: grafana-config
-            readOnly: true
-            subPath: influxdb-datasource.yml
-          - mountPath: /etc/grafana/provisioning/datasources/grafana-dashboard-provider.yml
-            name: grafana-config
-            readOnly: true
-            subPath: grafana-dashboard-provider.yml  ## subPath prevents overwriting other files in dir
         - name: kubernetes-dashboard
           image: kubernetesui/dashboard:v2.0.0
           imagePullPolicy: Always
@@ -186,10 +158,6 @@ spec:
             secretName: kubernetes-dashboard-certs
         - name: tmp-volume
           emptyDir: {}
-          # this is mine, for the grafana configmap
-        - configMap:
-            name: grafana-config
-          name: grafana-config
       serviceAccountName: rlucas-dashboard-serv-acc
 ---
 kind: Service

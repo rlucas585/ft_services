@@ -1,0 +1,24 @@
+Telegraf stuff
+
+	https://github.com/influxdata/telegraf/blob/release-1.12/plugins/inputs/kube_inventory/README.md
+		This one is the plugin for input from kube_inventory, which gives info like state_code
+	https://github.com/influxdata/telegraf/blob/release-1.12/plugins/inputs/kubernetes/README.md
+		This one is the plugin for input from the cluster in general, but I haven't managed
+		to get it working properly (but it may not be necessary).
+
+Setting up phpmyadmin
+
+	https://github.com/phpmyadmin/phpmyadmin/blob/master/sql/create_tables.sql
+
+Ongoing issues
+	
+	- I've not been able to get the Metrics working correctly through telegraf,
+	although the dashboard is able to get the metrics.
+
+	- The commands at the end of the /tmp/final.sql in the MySQL container
+	aren't being run - I can't tell why, but it may not be too significant
+
+	- Wordpress isn't appearing yet at all, but I think I should go an alternative
+	route to using wordpress (through wp-cli).
+	Before that, I'd like to go over mysql however and make sure I can connect
+	to it from the wordpress container.
