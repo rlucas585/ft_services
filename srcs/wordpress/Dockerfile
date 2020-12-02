@@ -33,9 +33,12 @@ RUN apk add php7-common \
 			php7-ctype \
 			php7-dom
 RUN apk add gettext \
-			&& apk add curl
+			&& apk add curl \
+			&& apk add jq
 RUN mkdir -p /run/nginx \
-			&& mkdir -p /sec
+			&& mkdir -p /sec \
+			&& mkdir -p /var/www/html \
+			&& mkdir -p /var/www/html/wordpress
 
 # COPY wordpress-5.5.3.tar.gz /var/www/html/wordpress.tar.gz
 COPY server.conf /etc/nginx/conf.d/default.conf
@@ -45,16 +48,21 @@ COPY supervisord.conf /etc/supervisord.conf
 # RUN rm -rf /var/www/html/wordpress.tar.gz
 
 RUN adduser -D rlucas
+RUN chmod 777 /var/www/html
+RUN chmod 777 /usr/local/bin
 
 COPY wp-config.php /tmp/wp-config.php
-COPY wp-config.php /var/www/html/wordpress
 COPY entry.sh /tmp/entry.sh
+COPY get_external_ip_addresses.sh /tmp/get_external_ip_addresses.sh
+COPY wpinstall.sh /tmp/wpinstall.sh
+
+WORKDIR /var/www/html/wordpress
+
+RUN chmod +x /tmp/*.sh
+RUN chmod 777 /var/www/html/wordpress
+RUN sed -i 's/;daemonize = yes/daemonize = no/g' /etc/php7/php-fpm.conf
 
 EXPOSE 5050
-
-WORKDIR /var/www/html
-
-RUN chmod +x /tmp/entry.sh
 
 CMD ["/bin/sh", "/tmp/entry.sh"]
 # CMD ["/bin/sh"]

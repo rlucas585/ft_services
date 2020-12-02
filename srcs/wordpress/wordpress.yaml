@@ -1,3 +1,41 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app: wordpress
+  name: wp-creds
+type: Opaque
+stringData:
+  WP_USER: admin
+  WP_PASS: codam
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ip-grabber
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: ip-grabber-cr
+rules:
+- apiGroups: [""]
+  resources: ["services"]
+  verbs: ["get","list","watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ip-grabber-crb
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ip-grabber-cr
+subjects:
+- kind: ServiceAccount
+  name: ip-grabber
+  namespace: default
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -14,11 +52,14 @@ spec:
       labels:
         app: wordpress
     spec:
+      serviceAccountName: ip-grabber
       containers:
         - name: wordpress
           envFrom:
           - secretRef:
               name: mysql-creds
+          - secretRef:
+              name: wp-creds
           image: rlucas-wordpress:1.0
           imagePullPolicy: Never
           ports:
@@ -27,15 +68,14 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  labels:
-    app: wordpress
   name: wordpress
   namespace: default
   annotations:
     metallb.universe.tf/allow-shared-ip: shared
 spec:
   type: LoadBalancer
+  selector:
+    app: wordpress
   ports:
     - port: 5050
-      targetPort: 5050
       name: http

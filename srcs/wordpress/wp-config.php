@@ -4,13 +4,16 @@
 define( 'DB_NAME', '${MYSQL_DB}' );
 
 /** MySQL database username */
-define( 'DB_USER', '${MYSQL_USERNAME}' );
+define( 'DB_USER', '${WP_USER}' );
 
 /** MySQL database password */
-define( 'DB_PASSWORD', '${MYSQL_PASSWORD}' );
+define( 'DB_PASSWORD', '${WP_PASS}' );
+
+define('WP_HOME', 'http://${EXTERNAL_IP}:5050');
+define('WP_SITEURL', 'http://${EXTERNAL_IP}:5050');
 
 /** MySQL hostname */
-define( 'DB_HOST', 'mysql' );
+define( 'DB_HOST', '${MYSQL_SERVNAME}' );
 
 /** Database Charset to use in creating database tables. */
 define( 'DB_CHARSET', 'utf8' );

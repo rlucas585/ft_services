@@ -6,9 +6,10 @@ metadata:
   name: mysql-creds
 type: Opaque
 stringData:
-  MYSQL_USERNAME: admin
+  MYSQL_USERNAME: mysql
   MYSQL_PASSWORD: codam
-  MYSQL_DB: mysqldb
+  MYSQL_DB: wordpress
+  MYSQL_SERVNAME: mysql
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -31,6 +32,8 @@ spec:
           envFrom:
           - secretRef:
               name: mysql-creds
+          - secretRef:
+              name: wp-creds
           image: rlucas-mysql:1.0
           imagePullPolicy: Never
           ports:
