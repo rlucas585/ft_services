@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app: ftps
+  name: ftps-creds
+type: Opaque
+stringData:
+  FTP_USER: admin
+  FTP_PASS: codam
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ftps
+  labels:
+    app: ftps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ftps
+  template:
+    metadata:
+      labels:
+        app: ftps
+    spec:
+      serviceAccountName: ip-grabber
+      containers:
+        - name: ftps
+          envFrom:
+          - secretRef:
+              name: ftps-creds
+          image: rlucas-ftps:1.0
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 20
+            - containerPort: 21
+            - containerPort: 30000
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: ftps
+  namespace: default
+  annotations:
+    metallb.universe.tf/allow-shared-ip: shared
+spec:
+  type: LoadBalancer
+  selector:
+    app: ftps
+  ports:
+    - port: 20
+      name: data-connection
+    - port: 21
+      name: control-port
+    - port: 30000
+      name: passive
