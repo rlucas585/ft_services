@@ -3,7 +3,15 @@
 		<title>Hello</title>
 	</head>
 	<body>
-		Hi there.
-		Confirming that nginx is up and running.
+		<h1>Hi there.</h1>
+		<p>Confirming that nginx is up and running.</p>
+		<h3>Links to other parts of the cluster:</h3>
+		<ul>
+			<li><a href="https://${EXTERNAL_IP}:2000">Kubernetes Dashboard</a></li>
+			<li><a href="http://${EXTERNAL_IP}:3000">Grafana Dashboard</a></li>
+			<li><a href="http://${EXTERNAL_IP}:5000">PhpMyadmin</a></li>
+			<li><a href="http://${EXTERNAL_IP}:5050">Wordpress</a></li>
+		</ul>
+		<p>Developed by Ryan Lucas</p>
 	</body>
 </html>

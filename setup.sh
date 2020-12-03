@@ -74,9 +74,6 @@ kubectl create configmap grafana-config \
 # Deploy Grafana
 kubectl apply -f srcs/grafana/grafana.yaml
 
-# Run root deployment (containing dashboard)
-# kubectl apply -f srcs/root.yaml
-
 # Run nginx deployment
 kubectl apply -f srcs/nginx/nginx.yaml
 

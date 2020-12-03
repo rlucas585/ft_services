@@ -6,14 +6,21 @@ if [ $? == 1 ]
 then
 	wp core download
 	wp core install --url=$EXTERNAL_IP --path=/var/www/html/wordpress --title="rlucas Wordpress" --admin_user="$WP_USER" --admin_password="$WP_PASS" --admin_email="rlucas@student.codam.nl" --skip-email
+	wp term create category Test
+	export ID=$(wp user get "$WP_USER" --field=ID)
+	wp post create --post_author=$ID --post_category="Test" --post_title="ft_services post" --post_content="This is the very first post in my ft_services wordpress container" --post_excerpt=tag --post_status=publish
 
-	# wp config create --dbname=$MYSQL_DB --dbuser=$MYSQL_USERNAME --prompt=dbpass # find a way to pass
-	# the environment variable MYSQL_PASSWORD into the config create line here
+	wp user create editor_user editor@example.com --role=editor --user_pass=editor
+    wp user create author_user author@example.com --role=author --user_pass=author
+    wp user create contibutor_user contributor@example.com --role=contributor --user_pass=contributor
+    wp user create subscriber_user subscriber@example.com --role=subscriber --user_pass=subscriber
 
-	# At this point, a connection to mysql is required, even to run the wp core is-installed
-	# line. I need to change the DB_HOST variable one way or another, possibly
-	# by simply COPY of a desired wp-config.php file.
+	export ID=$(wp user get "author_user" --field=ID)
+	wp post create --post_author=$ID --post_category="Test" --post_title="Leeds best" --post_content="Leeds are the best. Go Leeds." --post_excerpt=tag --post_status=publish
 
-	# more stuff here to install wordpress and set up users, make a sample post
+	wp theme install go
+	wp theme install twentyseventeen
+	wp theme install twentytwenty
+	wp theme activate go
 fi
 

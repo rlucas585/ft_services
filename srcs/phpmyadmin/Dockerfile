@@ -2,7 +2,7 @@ FROM alpine:latest
 
 RUN apk update \
 			&& apk add nginx \
-			&& apk add supervisor
+			&& apk add supervisor wget curl jq gettext
 RUN apk add php7-common \
 			php7-fpm \
 			php7-opcache \
@@ -31,32 +31,24 @@ RUN apk add php7-common \
 			php7-ldap \
 			php7-ctype \
 			php7-dom
-RUN apk add gettext \
-			&& apk add curl \
-			&& apk add jq
+
 RUN mkdir -p /run/nginx \
-			&& mkdir -p /var/www/html \
-			&& mkdir -p /var/www/html/wordpress
+	&& mkdir -p /var/www/html
+
+RUN wget https://files.phpmyadmin.net/phpMyAdmin/5.0.1/phpMyAdmin-5.0.1-english.tar.gz && \
+	tar -xzvf phpMyAdmin-5.0.1-english.tar.gz --strip-components=1 -C /var/www/html
 
 COPY server.conf /etc/nginx/conf.d/default.conf
 COPY supervisord.conf /etc/supervisord.conf
-
-RUN adduser -D rlucas
-RUN chmod 777 /var/www/html
-RUN chmod 777 /usr/local/bin
-
-COPY wp-config.php /tmp/wp-config.php
-COPY entry.sh /tmp/entry.sh
+COPY config.inc.php /tmp/config.inc.php
 COPY get_external_ip_addresses.sh /tmp/get_external_ip_addresses.sh
-COPY wpinstall.sh /tmp/wpinstall.sh
+COPY entry.sh /tmp/entry.sh
 
-WORKDIR /var/www/html/wordpress
+RUN chmod 777 /var/www/html
+
+WORKDIR /var/www/html
 
 RUN chmod +x /tmp/*.sh
-RUN chmod 777 /var/www/html/wordpress
 RUN sed -i 's/;daemonize = yes/daemonize = no/g' /etc/php7/php-fpm.conf
 
-EXPOSE 5050
-
 CMD ["/bin/sh", "/tmp/entry.sh"]
-# CMD ["/bin/sh"]
