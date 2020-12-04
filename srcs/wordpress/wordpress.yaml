@@ -60,10 +60,19 @@ spec:
               name: mysql-creds
           - secretRef:
               name: wp-creds
+          - secretRef:
+              name: ftps-creds
           image: rlucas-wordpress:1.0
           imagePullPolicy: Never
           ports:
             - containerPort: 5050
+          volumeMounts:
+          - mountPath: /www
+            name: www
+      volumes:
+      - name: www
+        persistentVolumeClaim:
+          claimName: wordpress
 ---
 kind: Service
 apiVersion: v1
@@ -79,3 +88,16 @@ spec:
   ports:
     - port: 5050
       name: http
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: wordpress
+  name: wordpress
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi

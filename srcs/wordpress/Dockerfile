@@ -35,25 +35,21 @@ RUN apk add gettext \
 			&& apk add curl \
 			&& apk add jq
 RUN mkdir -p /run/nginx \
-			&& mkdir -p /var/www/html \
-			&& mkdir -p /var/www/html/wordpress
+			&& mkdir -p /www
 
 COPY server.conf /etc/nginx/conf.d/default.conf
 COPY supervisord.conf /etc/supervisord.conf
 
-RUN adduser -D rlucas
-RUN chmod 777 /var/www/html
-RUN chmod 777 /usr/local/bin
+RUN adduser -h '/www' -D -g 'www' www
 
 COPY wp-config.php /tmp/wp-config.php
 COPY entry.sh /tmp/entry.sh
 COPY get_external_ip_addresses.sh /tmp/get_external_ip_addresses.sh
 COPY wpinstall.sh /tmp/wpinstall.sh
 
-WORKDIR /var/www/html/wordpress
+WORKDIR /www
 
 RUN chmod +x /tmp/*.sh
-RUN chmod 777 /var/www/html/wordpress
 RUN sed -i 's/;daemonize = yes/daemonize = no/g' /etc/php7/php-fpm.conf
 
 EXPOSE 5050

@@ -37,7 +37,13 @@ spec:
             - containerPort: 20
             - containerPort: 21
             - containerPort: 30000
-
+          volumeMounts:
+          - mountPath: /var/ftp/
+            name: var-ftp
+      volumes:
+      - name: var-ftp
+        persistentVolumeClaim:
+          claimName: wordpress
 ---
 kind: Service
 apiVersion: v1
@@ -52,8 +58,11 @@ spec:
     app: ftps
   ports:
     - port: 20
+      targetPort: 20
       name: data-connection
     - port: 21
+      targetPort: 21
       name: control-port
     - port: 30000
-      name: passive
+      targetPort: 30000
+      name: passive-port

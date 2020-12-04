@@ -30,20 +30,6 @@ kubectl create secret generic -n metallb-system memberlist \
 # can be created.
 kubectl apply -f srcs/metallb/metallb.yaml
 
-## Secret Generation
-
-# Create Secrets for InfluxDB
-# kubectl create secret generic influxdb-creds \
-# 	--from-literal=INFLUXDB_DATABASE=telegrafdb \
-# 	--from-literal=INFLUXDB_USERNAME=telegraf \
-# 	--from-literal=INFLUXDB_PASSWORD=codam \
-# 	--from-literal=INFLUXDB_HOST=influxdb
-
-# Create Secrets for Grafana	-- Now handled in yaml files.
-# kubectl create secret generic grafana-creds \
-# 	--from-literal=GF_SECURITY_ADMIN_USER=admin \
-# 	--from-literal=GF_SECURITY_ADMIN_PASSWORD=codam
-
 ## Create Docker images
 
 # This is important to do before attaching new pods - create the docker images
@@ -54,6 +40,8 @@ docker build -t rlucas-grafana:1.0 srcs/grafana
 docker build -t rlucas-telegraf:1.0 srcs/telegraf
 docker build -t rlucas-mysql:1.0 srcs/mysql
 docker build -t rlucas-wordpress:1.0 srcs/wordpress
+docker build -t rlucas-phpmyadmin:1.0 srcs/phpmyadmin
+docker build -t rlucas-ftps:1.0 srcs/ftps
 #PasswordAuthentication yes
 
 ## Apply yaml files
@@ -88,3 +76,9 @@ kubectl apply -f srcs/mysql/mysql.yaml
 
 # Deploy WordPress
 kubectl apply -f srcs/wordpress/wordpress.yaml
+
+# Deploy phpmyadmin
+kubectl apply -f srcs/phpmyadmin/phpmyadmin.yaml
+
+# Deploy FTPS
+kubectl apply -f srcs/ftps/ftps.yaml

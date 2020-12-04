@@ -63,6 +63,13 @@ $table_prefix = 'wp_';
  */
 define( 'WP_DEBUG', false );
 
+/* FTP information */
+
+define('FTP_USER', '${FTP_USER}');
+define('FTP_PASS', '${FTP_PASS}');
+define('FTP_HOST', '${EXTERNAL_IP}:21');
+define('FTP_SSL', false);
+
 /* That's all, stop editing! Happy publishing. */
 
 /** Absolute path to the WordPress directory. */

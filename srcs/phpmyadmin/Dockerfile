@@ -33,7 +33,8 @@ RUN apk add php7-common \
 			php7-dom
 
 RUN mkdir -p /run/nginx \
-	&& mkdir -p /var/www/html
+	&& mkdir -p /var/www/html \
+	&& mkdir -p /sec
 
 RUN wget https://files.phpmyadmin.net/phpMyAdmin/5.0.1/phpMyAdmin-5.0.1-english.tar.gz && \
 	tar -xzvf phpMyAdmin-5.0.1-english.tar.gz --strip-components=1 -C /var/www/html
@@ -43,6 +44,8 @@ COPY supervisord.conf /etc/supervisord.conf
 COPY config.inc.php /tmp/config.inc.php
 COPY get_external_ip_addresses.sh /tmp/get_external_ip_addresses.sh
 COPY entry.sh /tmp/entry.sh
+COPY localhost.key /sec/localhost.key
+COPY localhost.cert /sec/localhost.cert
 
 RUN chmod 777 /var/www/html
 

@@ -10,6 +10,14 @@ curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.pha
 chmod +x wp-cli.phar
 mv wp-cli.phar /usr/local/bin/wp
 
-su rlucas -c /tmp/wpinstall.sh
+chown www:www /user/local/bin/wp
+chown -R nobody:www /www
+
+addgroup nobody www
+chmod -R g+rwx /www
+
+su www -c /tmp/wpinstall.sh
+
+chmod -R g+rwx /www/*
 
 /usr/bin/supervisord -c /etc/supervisord.conf
