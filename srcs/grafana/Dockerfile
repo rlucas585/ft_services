@@ -4,8 +4,6 @@ RUN apk update \
 			&& echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories \
 			&& apk add grafana \
 			&& mkdir -p /var/lib/grafana/dashboards
-			# && mkdir -p /sec \
-			# && mkdir -p /etc/grafana
 
 COPY grafana-dashboard-provider.yml /usr/share/grafana/conf/provisioning/dashboards
 COPY influxdb-datasource.yml /usr/share/grafana/conf/provisioning/datasources

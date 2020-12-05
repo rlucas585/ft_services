@@ -16,4 +16,3 @@ RUN chown -R mysql:mysql /var/run/mysqld \
 RUN chmod +x ./entry.sh
 
 CMD ["/bin/sh", "./entry.sh"]
-# CMD ["/bin/sh"]

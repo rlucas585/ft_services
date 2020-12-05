@@ -12,7 +12,6 @@ RUN apk update \
 		&& mkdir -p /sec
 
 # To allow ssh as root with a password:
-
 RUN ssh-keygen -A \
 		&& echo 'root:codam2020' | chpasswd
 
@@ -32,4 +31,3 @@ EXPOSE 22 80 443
 WORKDIR /usr/www/
 
 CMD ["/bin/sh", "/tmp/entry.sh"]
-# CMD ["nginx", "-g", "daemon off;"];

@@ -1,7 +1,9 @@
 #!/bin/bash
 
 export MINIKUBE_IN_STYLE=false
-# export MINIKUBE_HOME=~/goinfre
+
+# Only for Codam, so the computers don't explode
+export MINIKUBE_HOME=~/goinfre
 
 # Start the minikube cluster using virtualbox as the driver.
 minikube start --driver=virtualbox
@@ -12,11 +14,6 @@ minikube addons enable metrics-server
 # minikube is running its own docker daemon, use this line to connect
 # to it.
 eval $(minikube -p minikube --shell zsh docker-env)
-
-# This line should set up auto complete options for kubectl
-source <(kubectl completion zsh)
-
-## MetalLB
 
 # First, the namespace metallb-system needs to be created
 kubectl apply -f srcs/metallb/metallb_namespace.yaml
@@ -32,8 +29,6 @@ kubectl apply -f srcs/metallb/metallb.yaml
 
 ## Create Docker images
 
-# This is important to do before attaching new pods - create the docker images
-# that the pods will run containers from
 docker build -t rlucas-nginx:1.0 srcs/nginx
 docker build -t rlucas-influxdb:1.0 srcs/influxdb
 docker build -t rlucas-grafana:1.0 srcs/grafana
@@ -42,7 +37,6 @@ docker build -t rlucas-mysql:1.0 srcs/mysql
 docker build -t rlucas-wordpress:1.0 srcs/wordpress
 docker build -t rlucas-phpmyadmin:1.0 srcs/phpmyadmin
 docker build -t rlucas-ftps:1.0 srcs/ftps
-#PasswordAuthentication yes
 
 ## Apply yaml files
 
