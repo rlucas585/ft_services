@@ -18,6 +18,7 @@ chmod -R g+rwx /www
 
 su www -c /tmp/wpinstall.sh
 
+chown -R nobody:www /www/*
 chmod -R g+rwx /www/*
 
 /usr/bin/supervisord -c /etc/supervisord.conf
